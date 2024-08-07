@@ -7,8 +7,10 @@ import com.mojang.serialization.Codec;
 import dev.shadowsoffire.apotheosis.adventure.AdventureModule;
 import dev.shadowsoffire.apotheosis.adventure.affix.Affix;
 import dev.shadowsoffire.apotheosis.adventure.affix.AffixType;
+import dev.shadowsoffire.apotheosis.adventure.affix.AttributeAffix.ModifierInst;
 import dev.shadowsoffire.apotheosis.adventure.loot.LootCategory;
 import dev.shadowsoffire.apotheosis.adventure.loot.LootRarity;
+import dev.shadowsoffire.placebo.util.StepFunction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -31,9 +33,11 @@ public class LuckAffix extends Affix {
             AdventureModule.LOGGER.debug("Attempted to apply the attributes of affix {} on item {}, but it is not an affix-compatible item!", this.getId(), stack.getHoverName().getString());
             return;
         }
+
+        ModifierInst modif = new ModifierInst(Attributes.LUCK, Operation.ADDITION, StepFunction.constant(rarity.ordinal()+1));
         for (EquipmentSlot slot : cat.getSlots()) {
             if (slot == type) {
-                map.accept(Attributes.LUCK, new AttributeModifier("affix:luck", rarity.ordinal()+1, Operation.ADDITION));
+                map.accept(modif.attr(), modif.build(stack, getId(), level));
             }
         }
     }
